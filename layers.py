@@ -89,6 +89,7 @@ class AbstractLayer(object):
 class ReluLayer(AbstractLayer):
     """ReLU layer class
     """
+
     def __init__(self):
         super().__init__()
         self.name = 'ReLU'
@@ -108,6 +109,7 @@ class ReluLayer(AbstractLayer):
 class TanhLayer(AbstractLayer):
     """Tanh layer class
     """
+
     def __init__(self):
         super().__init__()
         self.name = 'Tanh'
@@ -127,6 +129,7 @@ class TanhLayer(AbstractLayer):
 class SoftPlusLayer(AbstractLayer):
     """SoftPlus layer class
     """
+
     def __init__(self):
         super().__init__()
         self.name = 'SoftPlus'
@@ -146,6 +149,7 @@ class SoftPlusLayer(AbstractLayer):
 class MaxPoolingLayer(AbstractLayer):
     """Max-pooling layer class
     """
+
     def __init__(self, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1],
                  padding='SAME'):
         """Initializer
@@ -176,6 +180,7 @@ class MaxPoolingLayer(AbstractLayer):
 class DropOutLayer(AbstractLayer):
     """Drop-out layer class
     """
+
     def __init__(self, keep_prob=0.5, dtype=tf.float32):
         """Initalizer
 
@@ -204,6 +209,7 @@ class DropOutLayer(AbstractLayer):
 class BinaryFullyConnectedLayer(AbstractLayer):
     """Fully connected layer class
     """
+
     def __init__(self, out_dim, ema_decay_rate=0.5,
                  rho=1e-1, dtype=tf.float32):
         """Initalizer
@@ -372,6 +378,7 @@ class BinaryFullyConnectedLayer(AbstractLayer):
 class BinaryConvolutionLayer(BinaryFullyConnectedLayer):
     """Binary Convolutional layer class
     """
+
     def __init__(self, out_dim,
                  filter_size,
                  strides=[1, 1, 1, 1],
@@ -453,6 +460,7 @@ class BatchNormLayer(AbstractLayer):
     """
     Batch-normalization layer class
     """
+
     def __init__(self, learning_rate=1e-3, ema_decay_rate=0.9,
                  epsilon=1e-4, axes=[0], dtype=tf.float32):
         """Initializer
@@ -599,6 +607,7 @@ class TernaryFullyConnectedLayer(BinaryFullyConnectedLayer):
     """Ternary Fully connected layer class
     with {+1, 0, -1} as possible values
     """
+
     def __init__(self, out_dim,
                  reg_factor=1e-7,
                  ema_decay_rate=0.5,
@@ -663,6 +672,7 @@ class TernaryFullyConnectedLayer(BinaryFullyConnectedLayer):
 class TernaryConvolutionLayer(BinaryConvolutionLayer):
     """Ternary Convolutional layer class
     """
+
     def __init__(self, out_dim,
                  filter_size,
                  strides=[1, 1, 1, 1],

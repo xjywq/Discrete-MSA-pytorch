@@ -125,7 +125,7 @@ def reformat(images, labels, num_classes=10):
     images = images.transpose([3, 0, 1, 2])
     batch_size = labels.size
     onehot_labels = np.zeros((batch_size, num_classes))
-    onehot_labels[np.arange(batch_size), labels.squeeze()%num_classes] = 1
+    onehot_labels[np.arange(batch_size), labels.squeeze() % num_classes] = 1
     return images, onehot_labels
 
 

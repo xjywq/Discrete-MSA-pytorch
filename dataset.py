@@ -162,7 +162,8 @@ class DataSet:
                 # Test-set.
 
                 # Get all the valid filenames in the sub-dir named 'test'.
-                filenames_test = self._get_filenames(os.path.join(current_dir, 'test'))
+                filenames_test = self._get_filenames(
+                    os.path.join(current_dir, 'test'))
 
                 # Append them to the list of all filenames for the test-set.
                 self.filenames_test.extend(filenames_test)
@@ -227,7 +228,8 @@ class DataSet:
 
         for filename, cls in zip(filenames, class_numbers):
             # Full path-name for the file.
-            path = os.path.join(self.in_dir, self.class_names[cls], test_dir, filename)
+            path = os.path.join(
+                self.in_dir, self.class_names[cls], test_dir, filename)
 
             yield path
 
@@ -239,9 +241,9 @@ class DataSet:
         """
 
         return list(self.get_paths()), \
-               np.asarray(self.class_numbers), \
-               one_hot_encoded(class_numbers=self.class_numbers,
-                               num_classes=self.num_classes)
+            np.asarray(self.class_numbers), \
+            one_hot_encoded(class_numbers=self.class_numbers,
+                            num_classes=self.num_classes)
 
     def get_test_set(self):
         """
@@ -251,9 +253,9 @@ class DataSet:
         """
 
         return list(self.get_paths(test=True)), \
-               np.asarray(self.class_numbers_test), \
-               one_hot_encoded(class_numbers=self.class_numbers_test,
-                               num_classes=self.num_classes)
+            np.asarray(self.class_numbers_test), \
+            one_hot_encoded(class_numbers=self.class_numbers_test,
+                            num_classes=self.num_classes)
 
     def copy_files(self, train_dir, test_dir):
         """
@@ -274,13 +276,13 @@ class DataSet:
         knifey-spoony/spoony/test/
 
         But some APIs use another dir-structure for the training-set:
-        
+
         knifey-spoony/train/forky/
         knifey-spoony/train/knifey/
         knifey-spoony/train/spoony/
 
         and for the test-set:
-        
+
         knifey-spoony/test/forky/
         knifey-spoony/test/knifey/
         knifey-spoony/test/spoony/

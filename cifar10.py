@@ -192,7 +192,8 @@ def load_training_data():
     """
 
     # Pre-allocate the arrays for the images and class-numbers for efficiency.
-    images = np.zeros(shape=[_num_images_train, img_size, img_size, num_channels], dtype=float)
+    images = np.zeros(shape=[_num_images_train, img_size,
+                      img_size, num_channels], dtype=float)
     cls = np.zeros(shape=[_num_images_train], dtype=int)
 
     # Begin-index for the current batch.
@@ -201,7 +202,8 @@ def load_training_data():
     # For each data-file.
     for i in range(_num_files_train):
         # Load the images and class-numbers from the data-file.
-        images_batch, cls_batch = _load_data(filename="data_batch_" + str(i + 1))
+        images_batch, cls_batch = _load_data(
+            filename="data_batch_" + str(i + 1))
 
         # Number of images in this batch.
         num_images = len(images_batch)
