@@ -1,0 +1,9 @@
+# python
+__pycache__/
+
+# dataset
+MNIST_data/
+data/
+
+# venv
+venv/
