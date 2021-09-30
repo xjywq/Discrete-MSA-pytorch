@@ -26,9 +26,10 @@ class Model(torch.nn.Module):
     def add_layers(self, layer):
         self.layers.append(layer)
         self.n_layers += 1
-        self.layer_parameters.append(layer.named_parameters())
+        self.layer_parameters.append(layer.n_parameters())
+        # self.layer_parameters.append([])
         # for name_param in layer.named_parameters():
-        #     self.named_parameters.append((name_param))
+        #     self.layer_parameters[self.n_layers-1].append(name_param)
         # for param_tensor, value in layer.state_dict().items():
         #     self.state_dict[param_tensor] = value
 
@@ -39,32 +40,31 @@ class Model(torch.nn.Module):
             parameters = self.layer_parameters[i]
             layer = self.layers[i]
             x = self.xs[i]
-            for named_param in parameters:
-                print(named_param[0])
-                space.append({'name': named_param[0],
-                              'type': 'int', 'lb': -1, 'ub': 1})
+            for i in range(parameters):
+                space.append({'name': str(i),
+                              'type': 'num', 'lb': -10, 'ub': 10})
             space = DesignSpace().parse(space)
             opt = HEBO(space)
-            for iter in range(50):
+            for iter in range(10):
                 rec = opt.suggest()
-                for named_param in parameters:
-                    named_param.data.set_(
-                        rec.iloc[0].__getattr__(named_param[0]))
-                observation = -layer.getH(x, pout)
-                opt.observe(rec, np.array([observation]))
-                print('After %d iterations, best obj is %.3f' %
-                      (iter + 1, opt.y.min()))
-            for named_param in parameters:
-                named_param.data.set_(
-                    opt.best_x.iloc[0].__getattr__(named_param.name))
-            pout = layer.backward(x, pout)
+                layer.set_var(rec)
+                observation = layer.getH(x, pout)
+                opt.observe(rec, np.array([-observation]))
+                # print('After %d iterations, best obj is %.3f' %
+                #       (iter + 1, -opt.y.min()))
+
+            # print(opt.X)
+            # print(opt.y)
+            best_id = np.argmin(opt.y.squeeze())
+            best_x  = opt.X.iloc[[best_id]]
+            layer.set_var(best_x)
+            # pout = layer.backward(x, pout)
 
     def parameters(self):
         params = []
         for i in range(self.n_layers):
             for named_param in self.layer_parameters[i]:
                 params.append(named_param)
-                print(named_param)
         return params
 
 
@@ -148,24 +148,51 @@ class Conv2d_normal(torch.nn.Module):
         return output
 
 
+class FullyConnectLayer(AbstractLayer):
+    def __init__(self, indim=64, outdim=64, dtype=torch.float64):
+        super(FullyConnectLayer, self).__init__()
+        self.indim, self.outdim = indim, outdim
+        self.dtype = dtype
+        self.model = nn.Linear(self.indim, self.outdim, dtype=dtype)
+    
+    def forward(self, input):
+        return self.model(input)
+    
+    def n_parameters(self):
+        return 12
+    
+    def set_var(self, rec):
+        named_param = list(self.named_parameters())[0]
+        theta = torch.tensor([rec.iloc[0].__getattr__(str(i)) for i in range(9)], dtype=torch.float64).reshape(3, 3)
+        named_param[1].requires_grad = False
+        named_param[1].set_(theta)
+        named_param[1].requires_grad = True
+        named_param = list(self.named_parameters())[1]
+        theta = torch.tensor([rec.iloc[0].__getattr__(str(i)) for i in range(9, 12)], dtype=torch.float64).reshape(3)
+        named_param[1].requires_grad = False
+        named_param[1].set_(theta)
+        named_param[1].requires_grad = True
+
 if __name__ == '__main__':
     model = Model()
-    model.add_layers(Conv2d())
+    model.add_layers(FullyConnectLayer(3, 3, torch.float64))
+    model.add_layers(FullyConnectLayer(3, 3, torch.float64))
     # model.add_layers(Conv2d())
-    x = torch.randn(1, 5, 5, 3)
-    y = torch.randn(1, 3, 3, 16)
+    x = torch.randn(3).to(torch.float64) * 10
+    y = x ** 2 + np.random.uniform(0, 1, 3)
     loss_fn = nn.MSELoss()
-    lr = 1e-4
     # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # print(model.state_dict)
-    for e in range(5):
+    print(x, y)
+    for e in range(50):
         y_pred_1 = model(x)
         loss_1 = loss_fn(y_pred_1, y)
-        print('loss1:', loss_1)
+        print('epoch %d loss:' % e, loss_1.data)
         # model.zero_grad()
         # loss_1.backward()
-        print(loss_1)
         model.backward(loss_1)
+    
+    print(model(x), y)
 
     # model_normal = Conv2d_normal()
     # optimizer_norm = torch.optim.Adam(model_normal.parameters(), lr=lr)
